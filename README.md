@@ -3,8 +3,24 @@
 </p>
 
 # Teslo API 
+1. Clonar el proyecto
 
-1. Levantar la base de datos
+```shell
+git clone https://github.com/AnthoFu/04-teslo-shop
 ```
+
+2. Instalar las dependencias
+
+```shell
+npm i
+```
+
+3. Clonar el archivo ```.env.example``` y renombrarlo a ```.env```
+
+4. Cambiar las variables de entorno
+
+5. Levantar la base de datos
+
+```shell
 docker-compose up -d
 ```
