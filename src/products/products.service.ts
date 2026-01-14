@@ -7,6 +7,7 @@ import { Product } from './entities/product.entity';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { isUUID } from 'class-validator';
 import { ProductImage } from './entities';
+import { DataSource } from 'typeorm';
 
 
 @Injectable()
@@ -18,8 +19,10 @@ export class ProductsService {
 
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-        @InjectRepository(ProductImage)
+    @InjectRepository(ProductImage)
     private readonly productImageRepository: Repository<ProductImage>,
+
+    private readonly dataSource: DataSource,
 
 
   ){}
@@ -98,26 +101,44 @@ export class ProductsService {
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
-    const product = await this.productRepository.preload({
-      id:id,
-      ...updateProductDto,
-      images: []
-    });
+
+    const {images, ...toUpdate} = updateProductDto;
+
+    const product = await this.productRepository.preload({ id:id, ...toUpdate});
 
     if (!product){
       throw new NotFoundException(`El producto con el id "${id}" no fue encontrado`);
     }
 
+    // Crear query runner 
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try{
-      await this.productRepository.save(product);
+
+      if ( images ) { // Si hay images en la peticion patch
+        await queryRunner.manager.delete(ProductImage,{ product: { id } })
+        
+        product.images = images.map( 
+          image => this.productImageRepository.create( { url:image })
+        )
+      }
+
+      await queryRunner.manager.save( product );
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+
+      // await this.productRepository.save(product);
     }catch (error){
+
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+
       this.handleDBExceptions(error);
     }
 
-    
-
-    return product;
+    return this.findOnePlain( id );
   }
 
   async remove(id: string) {
