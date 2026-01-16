@@ -157,4 +157,16 @@ export class ProductsService {
     this.logger.error(error)
     throw new InternalServerErrorException('Ha ocurrido un error interno inesperado. Por favor revisa los logs.')
   }
+
+  async deleteAllProducts(){
+    const query = this.productRepository.createQueryBuilder();
+    try {
+      return await query
+      .delete()
+      .where({})
+      .execute();
+    } catch (error){
+      this.handleDBExceptions(error);
+    }
+  }
 }
