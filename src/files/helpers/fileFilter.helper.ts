@@ -1,7 +1,5 @@
 export const fileFilter = (request: Express.Request, file:Express.Multer.File, callback: Function )=> {
 
-    console.log(file)
-
     if (!file ) {
         return callback( new Error('El archivo esta vacio'), false);
     }
