@@ -8,5 +8,5 @@ export const fileNamer = (request: Express.Request, file:Express.Multer.File, ca
     const fileExtension = file.mimetype.split('/')[1];
 
     const fileName = `${uuid()}.${fileExtension}`
-    callback(null, false);
+    callback(null, fileName);
 }
