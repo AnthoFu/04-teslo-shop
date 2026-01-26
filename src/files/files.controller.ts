@@ -4,10 +4,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { fileFilter, fileNamer } from './helpers';
 import { diskStorage } from 'multer';
 import type { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('files')
 export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+  constructor(
+    private readonly filesService: FilesService,
+    private readonly configService: ConfigService
+  ) {}
 
   @Get('product/:imageName')
   findProductImage(
@@ -24,7 +28,7 @@ export class FilesController {
   @UseInterceptors( FileInterceptor('file', {
     fileFilter: fileFilter,
     storage: diskStorage({
-      destination: './static/uploads',
+      destination: './static/products',
       filename: fileNamer
     })
   }) )
@@ -37,7 +41,7 @@ export class FilesController {
       throw new BadRequestException('Asegurate de que el archivo este en un formato de imagen valido.')
     }
 
-    const secureUrl = `${file.filename}`
+    const secureUrl = `${this.configService.get('HOST_API')}/files/product/${file.filename}`
 
     return {
       secureUrl
