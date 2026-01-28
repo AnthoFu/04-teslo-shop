@@ -12,13 +12,41 @@ interface SeedProduct {
 
 type ValidSizes = 'XS'|'S'|'M'|'L'|'XL'|'XXL'|'XXXL';
 
-
+interface SeedUser {
+    email:string;
+    fullName:string;
+    password: string;
+    roles: string[];
+}
 interface SeedData {
+    users: SeedUser[],
     products: SeedProduct[];
 }
 
 
 export const initialData: SeedData = {
+
+    users: [
+        {
+            email: 'anthonytest@gmail.com',
+            fullName: 'AnthoFu',
+            roles: ['admin', 'user','super-user'],
+            password:'abc1234'
+        },
+        {
+            email: 'sammytest@gmail.com',
+            fullName: 'Sammy',
+            roles: ['admin'],
+            password:'abc1234'
+        },
+        {
+            email: 'andytest@gmail.com',
+            fullName: 'Andy',
+            roles: ['user'],
+            password:'abc1234'
+        }
+    ],
+
     products: [
         {
             description: "Presentamos la Tesla Chill Collection. La sudadera de cuello redondo para hombre Chill tiene un exterior premium de peso pesado y un interior de forro polar suave para mayor comodidad en cualquier temporada. La sudadera presenta un sutil logotipo T de poliuretano termoplástico en el pecho y una marca denominativa de Tesla debajo del cuello trasero. Hecho de 60% algodón y 40% poliéster reciclado.",
