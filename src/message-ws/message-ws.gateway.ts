@@ -18,7 +18,7 @@ export class MessageWsGateway  implements OnGatewayConnection, OnGatewayDisconne
   ) {}
 
 
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
     // console.log('Cliente conectado', client.id);
 
     const token = client.handshake.headers.authentication;
@@ -29,15 +29,15 @@ export class MessageWsGateway  implements OnGatewayConnection, OnGatewayDisconne
       if (typeof token !== 'string') {
         throw new Error('Invalid token');
       }
-      payload = this.jwtService.verify(token);
+    payload = this.jwtService.verify(token);
+    await this.messageWsService.registerClient(client, payload.id);
     } catch (error) {
       client.disconnect();
       return;
     }
-    console.log({payload})
+    // console.log({payload})
     
 
-    this.messageWsService.registerClient(client);
     this.wss.emit('clients-updated', this.messageWsService.getConnectedClients())
     // console.log('Clientes conectados:', this.messageWsService.getConnectedClients())
   }
@@ -68,7 +68,7 @@ export class MessageWsGateway  implements OnGatewayConnection, OnGatewayDisconne
 
     //! Esto emite a todos, incluyendo el cliente inicial
     this.wss.emit('message-from-server', {
-      fullName: 'Soy AnthoFu!',
+      fullName: this.messageWsService.getUserFullNameBySocket(client.id),
       message: payload.message || 'Sin mensaje'
     })
   }
