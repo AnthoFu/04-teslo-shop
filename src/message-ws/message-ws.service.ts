@@ -40,7 +40,7 @@ export class MessageWsService {
 
         
         getConnectedClients(): string[] {
-            return Object.keys(this.connectedClients);
+            return Object.values(this.connectedClients).map(client => client.user.fullName);
         }
 
         getUserFullNameBySocket(socketId:string){
